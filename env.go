@@ -69,20 +69,20 @@ func setStructValues(structElem *reflect.Value) error {
 }
 
 func getEnvValue(field *reflect.StructField) string {
-	envVariableName := field.Tag.Get("env")
+	envKey := field.Tag.Get("env")
 	defaultValue := field.Tag.Get("envDefault")
 
-	if envVariableName == "" {
+	if envKey == "" {
 		return defaultValue
 	}
 
-	envVariable := os.Getenv(envVariableName)
+	envValue := os.Getenv(envKey)
 
-	if envVariable == "" {
+	if envValue == "" {
 		return defaultValue
 	}
 
-	return envVariable
+	return envValue
 }
 
 func setEnvVariable(field *reflect.Value, envValue string) error {
