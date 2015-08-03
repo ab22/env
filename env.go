@@ -1,15 +1,10 @@
 package env
 
 import (
-	"errors"
 	"os"
 	"reflect"
 	"strconv"
 )
-
-var InvalidInterfaceError = errors.New("env parse: expected struct or pointer to struct")
-var UnsupportedFieldKindError = errors.New("env parse: unsupported field kind")
-var FieldMustBeAssignableError = errors.New("env parse: cannot set value to unexported field")
 
 func Parse(i interface{}) error {
 	var elem *reflect.Value
@@ -60,7 +55,7 @@ func setStructValues(structElem *reflect.Value) error {
 			continue
 		}
 
-		if err := setEnvVariable(&fieldValue, envValue); err != nil {
+		if err := setValue(&fieldValue, structField.Name, envValue); err != nil {
 			return err
 		}
 	}
@@ -85,12 +80,14 @@ func getEnvValue(field *reflect.StructField) string {
 	return envValue
 }
 
-func setEnvVariable(field *reflect.Value, envValue string) error {
+func setValue(field *reflect.Value, fieldName string, envValue string) error {
 	if !field.CanSet() {
-		return FieldMustBeAssignableError
+		return FieldMustBeAssignableError{FieldName: fieldName}
 	}
 
-	switch field.Kind() {
+	fieldKind := field.Kind()
+
+	switch fieldKind {
 	case reflect.String:
 		field.SetString(envValue)
 	case reflect.Int:
@@ -118,7 +115,10 @@ func setEnvVariable(field *reflect.Value, envValue string) error {
 
 		field.SetFloat(floatValue)
 	default:
-		return UnsupportedFieldKindError
+		return UnsupportedFieldKindError{
+			FieldName: fieldName,
+			FieldKind: fieldKind.String(),
+		}
 	}
 
 	return nil
