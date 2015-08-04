@@ -1,6 +1,8 @@
 # env
 
-## Example
+Use tag structures to parse environment variables into structure fields.
+
+## Usage
 
 ```go
 package main
