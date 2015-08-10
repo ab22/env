@@ -20,7 +20,7 @@ func Parse(i interface{}) error {
 
 func getStructureElement(i interface{}) (*reflect.Value, error) {
 	if isInvalidInterface(i) {
-		return nil, InvalidInterfaceError
+		return nil, &InvalidInterfaceError{}
 	}
 
 	elem := reflect.ValueOf(i).Elem()
@@ -35,9 +35,11 @@ func isInvalidInterface(i interface{}) bool {
 	interfaceValue := reflect.ValueOf(i)
 	interfaceKind := interfaceValue.Kind()
 
-	if interfaceKind == reflect.Ptr {
-		interfaceKind = interfaceValue.Elem().Kind()
+	if interfaceKind != reflect.Ptr {
+		return true
 	}
+
+	interfaceKind = interfaceValue.Elem().Kind()
 
 	return interfaceKind != reflect.Struct
 }
@@ -82,7 +84,7 @@ func getEnvValue(field *reflect.StructField) string {
 
 func setValue(field *reflect.Value, fieldName string, envValue string) error {
 	if !field.CanSet() {
-		return FieldMustBeAssignableError{FieldName: fieldName}
+		return &FieldMustBeAssignableError{FieldName: fieldName}
 	}
 
 	fieldKind := field.Kind()
@@ -107,6 +109,7 @@ func setValue(field *reflect.Value, fieldName string, envValue string) error {
 
 		field.SetBool(boolValue)
 	case reflect.Float32:
+
 		floatValue, err := strconv.ParseFloat(envValue, 32)
 
 		if err != nil {
@@ -115,7 +118,7 @@ func setValue(field *reflect.Value, fieldName string, envValue string) error {
 
 		field.SetFloat(floatValue)
 	default:
-		return UnsupportedFieldKindError{
+		return &UnsupportedFieldKindError{
 			FieldName: fieldName,
 			FieldKind: fieldKind.String(),
 		}

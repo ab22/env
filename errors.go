@@ -1,11 +1,15 @@
 package env
 
 import (
-	"errors"
 	"fmt"
 )
 
-var InvalidInterfaceError = errors.New("env: struct parsing: expected struct or pointer to struct")
+type InvalidInterfaceError struct {
+}
+
+func (e InvalidInterfaceError) Error() string {
+	return "env: struct parsing: expected pointer to struct"
+}
 
 type UnsupportedFieldKindError struct {
 	FieldName string
