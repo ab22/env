@@ -7,24 +7,12 @@ import (
 )
 
 func Parse(i interface{}) error {
-	var elem *reflect.Value
-	var err error
-
-	if elem, err = getStructureElement(i); err != nil {
-		return err
-	}
-
-	err = setStructValues(elem)
-	return err
-}
-
-func getStructureElement(i interface{}) (*reflect.Value, error) {
 	if isInvalidInterface(i) {
-		return nil, &InvalidInterfaceError{}
+		return &InvalidInterfaceError{}
 	}
 
 	elem := reflect.ValueOf(i).Elem()
-	return &elem, nil
+	return setStructValues(&elem)
 }
 
 func isInvalidInterface(i interface{}) bool {
