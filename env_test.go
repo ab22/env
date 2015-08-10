@@ -17,7 +17,7 @@ const (
 )
 
 // Struct to test env variables and default env values
-type SupportedTypesStruct struct {
+type SupportedTypes struct {
 	StringType string  `env:"STRING_VAR" envDefault:"DefaultStringVal"`
 	IntType    int     `env:"INT_VAR" envDefault:"1234"`
 	FloatType  float32 `env:"FLOAT_VAR" envDefault:"4321.12"`
@@ -25,11 +25,21 @@ type SupportedTypesStruct struct {
 }
 
 // Struct with no env tags set
-type NoTagValuesStruct struct {
+type NoTagValues struct {
 	StringType string
 	IntType    int
 	FloatType  float32
 	BoolType   bool
+}
+
+// Struct with no accessable fields
+type NonAccessableFields struct {
+	s string `env:"STRING_VAR" envDefault:"DefaultStringVal"`
+}
+
+// Struct with a unsupported field kind
+type UnSupportedField struct {
+	Numbers []int `env:"NUMBERS" envDefault:"1,2,3"`
 }
 
 // Test when parsing invalid types.
@@ -41,7 +51,7 @@ func TestInvalidInterfaces(t *testing.T) {
 		float32(4321.12),
 		true,
 		nil,
-		SupportedTypesStruct{},
+		SupportedTypes{},
 	}
 
 	for _, v := range values {
@@ -68,7 +78,7 @@ func TestEnvironmentValues(t *testing.T) {
 	intVar := 6789
 	floatVar := float32(1234.56)
 	boolVar := true
-	s := &SupportedTypesStruct{}
+	s := &SupportedTypes{}
 
 	os.Setenv("STRING_VAR", stringVar)
 	os.Setenv("INT_VAR", fmt.Sprintf("%d", intVar))
@@ -106,7 +116,7 @@ func TestEnvironmentValues(t *testing.T) {
 // Test a struct with no env value set.
 // It should set the default values of the structure to the fields.
 func TestDefaultValues(t *testing.T) {
-	s := &SupportedTypesStruct{}
+	s := &SupportedTypes{}
 
 	if err := env.Parse(s); err != nil {
 		t.Fatalf("Parsing struct by reference: %v", err.Error())
@@ -133,7 +143,7 @@ func TestDefaultValues(t *testing.T) {
 // It should not set any values to it and the values in the struct
 // should be the default values that Go sets up.
 func TestNoTagsSet(t *testing.T) {
-	s := &NoTagValuesStruct{}
+	s := &NoTagValues{}
 
 	if err := env.Parse(s); err != nil {
 		t.Fatalf("Error parsing struct with no tags set: %v", err.Error())
@@ -154,4 +164,38 @@ func TestNoTagsSet(t *testing.T) {
 	if s.StringType != "" {
 		t.Errorf("Test default values: string value was not set properly. Expected: [%v] but was [%v]", "", s.StringType)
 	}
+}
+
+// Test a struct with no accessable fields.
+// It should return a *FieldMustBeAssignableError.
+func TestNonAssignableFields(t *testing.T) {
+	var err error
+	s := &NonAccessableFields{}
+
+	if err = env.Parse(s); err != nil {
+		_, ok := err.(*env.FieldMustBeAssignableError)
+
+		if ok {
+			return
+		}
+	}
+
+	t.Errorf("Expected: [*env.FieldMustBeAssignable] but got: [%s] ", err)
+}
+
+// Test a struct with a unsupported type
+// It should return a *UnsupportedFieldKindError.
+func TestUnSupportedField(t *testing.T) {
+	var err error
+	s := &UnSupportedField{}
+
+	if err = env.Parse(s); err != nil {
+		_, ok := err.(*env.UnsupportedFieldKindError)
+
+		if ok {
+			return
+		}
+	}
+
+	t.Errorf("Expected: [*env.UnsupportedFieldKindError] but got: [%s] ", err)
 }
