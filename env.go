@@ -51,7 +51,7 @@ func setStructValues(structElem *reflect.Value) error {
 	for i := 0; i < numFields; i++ {
 		structField := structType.Field(i)
 		fieldValue := structElem.Field(i)
-		envValue := getEnvValue(&structField)
+		envValue := getEnvOrDefaultValue(&structField)
 
 		if envValue == "" {
 			continue
@@ -65,7 +65,7 @@ func setStructValues(structElem *reflect.Value) error {
 	return nil
 }
 
-func getEnvValue(field *reflect.StructField) string {
+func getEnvOrDefaultValue(field *reflect.StructField) string {
 	envKey := field.Tag.Get("env")
 	defaultValue := field.Tag.Get("envDefault")
 
