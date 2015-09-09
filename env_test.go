@@ -34,7 +34,7 @@ type NoTagValues struct {
 
 // Struct with no accessable fields
 type NonAccessableFields struct {
-	s string `env:"STRING_VAR" envDefault:"DefaultStringVal"`
+	unexportedField string `env:"STRING_VAR" envDefault:"DefaultStringVal"`
 }
 
 // Struct with a unsupported field kind
@@ -58,14 +58,14 @@ func TestInvalidInterfaces(t *testing.T) {
 		// Parse by value
 		if err := env.Parse(v); err == nil {
 			t.Errorf("Accepting invalid type:", reflect.TypeOf(v))
-		} else if _, ok := err.(*env.InvalidInterfaceError); !ok {
+		} else if err != env.InvalidInterfaceError {
 			t.Fatal("Error should be of *env.InvalidInterfaceError but was:", reflect.TypeOf(v))
 		}
 
 		// Parse by reference
 		if err := env.Parse(&v); err == nil {
 			t.Errorf("env.Parse accepting invalid type by reference:", reflect.TypeOf(&v))
-		} else if _, ok := err.(*env.InvalidInterfaceError); !ok {
+		} else if err != env.InvalidInterfaceError {
 			t.Fatal("Error should be of *env.InvalidInterfaceError but was:", reflect.TypeOf(v))
 		}
 	}
@@ -173,7 +173,7 @@ func TestNonAssignableFields(t *testing.T) {
 	s := &NonAccessableFields{}
 
 	if err = env.Parse(s); err != nil {
-		_, ok := err.(*env.FieldMustBeAssignableError)
+		_, ok := err.(env.FieldMustBeAssignableError)
 
 		if ok {
 			return

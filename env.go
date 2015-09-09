@@ -8,7 +8,7 @@ import (
 
 func Parse(i interface{}) error {
 	if isInvalidInterface(i) {
-		return &InvalidInterfaceError{}
+		return InvalidInterfaceError
 	}
 
 	elem := reflect.ValueOf(i).Elem()
@@ -72,7 +72,7 @@ func getEnvOrDefaultValue(field *reflect.StructField) string {
 
 func setValue(field *reflect.Value, fieldName string, envValue string) error {
 	if !field.CanSet() {
-		return &FieldMustBeAssignableError{FieldName: fieldName}
+		return FieldMustBeAssignableError(fieldName)
 	}
 
 	fieldKind := field.Kind()
