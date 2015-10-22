@@ -39,6 +39,15 @@ func setStructValues(structElem *reflect.Value) error {
 	for i := 0; i < numFields; i++ {
 		structField := structType.Field(i)
 		fieldValue := structElem.Field(i)
+
+		if fieldValue.Kind() == reflect.Struct {
+			if err := setValue(&fieldValue, structField.Name, ""); err != nil {
+				return err
+			}
+
+			continue
+		}
+
 		envValue := getEnvOrDefaultValue(&structField)
 
 		if envValue == "" {
@@ -105,6 +114,8 @@ func setValue(field *reflect.Value, fieldName string, envValue string) error {
 		}
 
 		field.SetFloat(floatValue)
+	case reflect.Struct:
+		return Parse(field.Addr().Interface())
 	default:
 		return &UnsupportedFieldKindError{
 			FieldName: fieldName,

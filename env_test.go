@@ -16,7 +16,7 @@ const (
 	defaultBool   = true
 )
 
-// Struct to test env variables and default env values
+// Struct to test env variables and default env values.
 type SupportedTypes struct {
 	StringType string  `env:"STRING_VAR" envDefault:"DefaultStringVal"`
 	IntType    int     `env:"INT_VAR" envDefault:"1234"`
@@ -24,26 +24,48 @@ type SupportedTypes struct {
 	BoolType   bool    `env:"BOOL_VAR" envDefault:"true"`
 }
 
-// Struct with no env tags set
+// Struct with no env tags set.
 type NoTagValues struct {
 	StringType string
 	IntType    int
 	FloatType  float32
 	BoolType   bool
+
+	AnotherStruct struct {
+		IntType   int
+		FloatType float32
+	}
 }
 
-// Struct with no accessable fields
+// Struct to test recursive structs.
+type RecursiveStruct struct {
+	StringType string `env:"STRING_VAR" envDefault:"DefaultStringVal"`
+
+	AnotherStruct struct {
+		IntType   int     `env:"INT_VAR" envDefault:"1234"`
+		FloatType float32 `env:"FLOAT_VAR" envDefault:"4321.12"`
+	}
+}
+
+// Struct to test unaccessable struct
+type RecursiveUnexportedStruct struct {
+	anotherStruct struct {
+		intType int
+	}
+}
+
+// Struct with no accessable fields.
 type NonAccessableFields struct {
 	unexportedField string `env:"STRING_VAR" envDefault:"DefaultStringVal"`
 }
 
-// Struct with a unsupported field kind
+// Struct with a unsupported field kind.
 type UnSupportedField struct {
 	Numbers []int `env:"NUMBERS" envDefault:"1,2,3"`
 }
 
 // Test when parsing invalid types.
-// env.Parse should return an *env.InvalidInterfaceError
+// env.Parse should return an *env.InvalidInterfaceError.
 func TestInvalidInterfaces(t *testing.T) {
 	values := []interface{}{
 		"string type",
@@ -96,19 +118,19 @@ func TestEnvironmentValues(t *testing.T) {
 	}
 
 	if s.BoolType != boolVar {
-		t.Errorf("Test default values: bool value was not set properly. Expected: [%v] but was [%v]", boolVar, s.BoolType)
+		t.Errorf("Test env values: bool value was not set properly. Expected: [%v] but was [%v]", boolVar, s.BoolType)
 	}
 
 	if s.FloatType != floatVar {
-		t.Errorf("Test default values: float value was not set properly. Expected: [%v] but was [%v]", floatVar, s.FloatType)
+		t.Errorf("Test env values: float value was not set properly. Expected: [%v] but was [%v]", floatVar, s.FloatType)
 	}
 
 	if s.IntType != intVar {
-		t.Errorf("Test default values: int value was not set properly. Expected: [%v] but was [%v]", intVar, s.IntType)
+		t.Errorf("Test env values: int value was not set properly. Expected: [%v] but was [%v]", intVar, s.IntType)
 	}
 
 	if s.StringType != stringVar {
-		t.Errorf("Test default values: string value was not set properly. Expected: [%v] but was [%v]", stringVar, s.StringType)
+		t.Errorf("Test env values: string value was not set properly. Expected: [%v] but was [%v]", stringVar, s.StringType)
 	}
 
 }
@@ -123,19 +145,19 @@ func TestDefaultValues(t *testing.T) {
 	}
 
 	if s.BoolType != defaultBool {
-		t.Errorf("Test default values: bool value was not set properly. Expected: [%v] but was [%v]", defaultBool, s.BoolType)
+		t.Errorf("Test envDefault values: bool value was not set properly. Expected: [%v] but was [%v]", defaultBool, s.BoolType)
 	}
 
 	if s.FloatType != defaultFloat {
-		t.Errorf("Test default values: float value was not set properly. Expected: [%v] but was [%v]", defaultFloat, s.FloatType)
+		t.Errorf("Test envDefault values: float value was not set properly. Expected: [%v] but was [%v]", defaultFloat, s.FloatType)
 	}
 
 	if s.IntType != defaultInt {
-		t.Errorf("Test default values: int value was not set properly. Expected: [%v] but was [%v]", defaultInt, s.IntType)
+		t.Errorf("Test envDefault values: int value was not set properly. Expected: [%v] but was [%v]", defaultInt, s.IntType)
 	}
 
 	if s.StringType != defaultString {
-		t.Errorf("Test default values: string value was not set properly. Expected: [%v] but was [%v]", defaultString, s.StringType)
+		t.Errorf("Test envDefault values: string value was not set properly. Expected: [%v] but was [%v]", defaultString, s.StringType)
 	}
 }
 
@@ -163,6 +185,14 @@ func TestNoTagsSet(t *testing.T) {
 
 	if s.StringType != "" {
 		t.Errorf("Test default values: string value was not set properly. Expected: [%v] but was [%v]", "", s.StringType)
+	}
+
+	if s.AnotherStruct.FloatType != 0 {
+		t.Errorf("Test default values: float value was not set properly. Expected: [%v] but was [%v]", 0, s.AnotherStruct.FloatType)
+	}
+
+	if s.AnotherStruct.IntType != 0 {
+		t.Errorf("Test default values: int value was not set properly. Expected: [%v] but was [%v]", 0, s.AnotherStruct.IntType)
 	}
 }
 
@@ -198,4 +228,42 @@ func TestUnSupportedField(t *testing.T) {
 	}
 
 	t.Errorf("Expected: [*env.UnsupportedFieldKindError] but got: [%s] ", err)
+}
+
+// Test when parsing a struct that has an struct. Values should be set
+// recursively into the embedded struct.
+func TestRecursiveStructs(t *testing.T) {
+	s := &RecursiveStruct{}
+
+	if err := env.Parse(s); err != nil {
+		t.Fatalf("Parsing struct by reference: %v", err.Error())
+	}
+
+	if s.StringType != defaultString {
+		t.Errorf("Test recursive structs: string value was not set properly. Expected: [%v] but was [%v]", defaultString, s.StringType)
+	}
+
+	if s.AnotherStruct.IntType != defaultInt {
+		t.Errorf("Test recursive structs: int value was not set properly. Expected: [%v] but was [%v]", defaultInt, s.AnotherStruct.IntType)
+	}
+
+	if s.AnotherStruct.FloatType != defaultFloat {
+		t.Errorf("Test env values: float value was not set properly. Expected: [%v] but was [%v]", defaultFloat, s.AnotherStruct.FloatType)
+	}
+}
+
+// Test when parsing a struct that has an unaccessable/unexported field struct.
+func TestRecursiveUnaccessableStruct(t *testing.T) {
+	var err error
+	s := &RecursiveUnexportedStruct{}
+
+	if err = env.Parse(s); err != nil {
+		_, ok := err.(env.FieldMustBeAssignableError)
+
+		if ok {
+			return
+		}
+	}
+
+	t.Errorf("Expected: [*env.FieldMustBeAssignable] but got: [%s] ", err)
 }
