@@ -2,14 +2,16 @@
 
 Use tag structures to parse environment variables into structure fields.
 
-## Usage
+Having structs inside structs parsed is now possible. Updated the example below with fully working code.
+
+## Example
 
 ```go
 package main
 
 import (
-	"fmt"
 	"github.com/ab22/env"
+	"log"
 )
 
 type AppConfig struct {
@@ -33,10 +35,25 @@ type AppConfig struct {
 	}
 }
 
+// Print configuration values to the log. Some user and password fields
+// are omitted for security reasons.
+func (c *AppConfig) Print() {
+	log.Println("----------------------------------")
+	log.Println("Application Port:", c.Port)
+	log.Println("     Environment:", c.Env)
+	log.Println("       SMTP Host:", c.Smtp.Host)
+	log.Println("       SMTP User:", c.Smtp.User)
+	log.Println("       SMTP Port:", c.Smtp.Port)
+	log.Println("   Database Host:", c.Db.Host)
+	log.Println("   Database Port:", c.Db.Port)
+	log.Println("   Database Name:", c.Db.Name)
+	log.Println("----------------------------------")
+}
+
 func main() {
 	config := &AppConfig{}
 
 	env.Parse(config)
-	fmt.Println(config)
+	config.Print()
 }
 ```
