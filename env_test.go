@@ -137,7 +137,7 @@ func TestEnvironmentValues(t *testing.T) {
 
 // Test a struct with no env value set.
 // It should set the default values of the structure to the fields.
-func TestDefaultValues(t *testing.T) {
+func TestEnvDefaultValues(t *testing.T) {
 	s := &SupportedTypes{}
 
 	if err := env.Parse(s); err != nil {
@@ -248,7 +248,7 @@ func TestRecursiveStructs(t *testing.T) {
 	}
 
 	if s.AnotherStruct.FloatType != defaultFloat {
-		t.Errorf("Test env values: float value was not set properly. Expected: [%v] but was [%v]", defaultFloat, s.AnotherStruct.FloatType)
+		t.Errorf("Test recursive structs: float value was not set properly. Expected: [%v] but was [%v]", defaultFloat, s.AnotherStruct.FloatType)
 	}
 }
 
