@@ -56,9 +56,9 @@ func main() {
 	env.Parse(config)
 	config.Print()
 }
-
-// Prints:
-/*
+```
+The example above prints:
+```shell
 2015/11/01 18:01:13 ----------------------------------
 2015/11/01 18:01:13 Application Port: 1337
 2015/11/01 18:01:13      Environment: PRODUCTION
@@ -69,5 +69,4 @@ func main() {
 2015/11/01 18:01:13    Database Port: 5432
 2015/11/01 18:01:13    Database Name: lol_db
 2015/11/01 18:01:13 ----------------------------------
-*/
 ```
