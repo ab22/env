@@ -1,5 +1,7 @@
 # env
 
+[![Build Status](https://travis-ci.org/ab22/env.svg)](https://travis-ci.org/ab22/env)
+
 Use tag structures to parse environment variables into structure fields.
 
 Having structs inside structs parsed is now possible. Updated the example below with fully working code.
