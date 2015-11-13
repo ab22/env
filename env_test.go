@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"syscall"
 	"testing"
 
 	"github.com/ab22/env"
@@ -107,10 +108,7 @@ func TestEnvironmentValues(t *testing.T) {
 	os.Setenv("FLOAT_VAR", fmt.Sprintf("%f", floatVar))
 	os.Setenv("BOOL_VAR", fmt.Sprintf("%t", boolVar))
 	defer func() {
-		os.Unsetenv("STRING_VAR")
-		os.Unsetenv("INT_VAR")
-		os.Unsetenv("FLOAT_VAR")
-		os.Unsetenv("BOOL_VAR")
+		syscall.Clearenv()
 	}()
 
 	if err := env.Parse(s); err != nil {
