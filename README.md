@@ -1,6 +1,7 @@
 # env
 
 [![Build Status](https://travis-ci.org/ab22/env.svg)](https://travis-ci.org/ab22/env)
+[![GoDoc](https://godoc.org/github.com/ab22/env?status.svg)](https://godoc.org/github.com/ab22/env)
 
 Use tag structures to parse environment variables into structure fields.
 
