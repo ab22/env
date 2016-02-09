@@ -97,8 +97,8 @@ func getEnvOrDefaultValue(field *reflect.StructField) string {
 }
 
 // setValue function is in charge of determining if the field is an
-// exported field (accessable). We return a ErrFieldMustBeAssignable if
-// the field is unaccessable.
+// exported field (accesible). We return a ErrFieldMustBeAssignable if
+// the field is unaccesible.
 //
 // For each of the supported types, we just parse the string value into the
 // corresponding type and assigned it to the field. If there's an error when

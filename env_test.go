@@ -48,15 +48,15 @@ type RecursiveStruct struct {
 	}
 }
 
-// Struct to test unaccessable struct
+// Struct to test unaccesible struct
 type RecursiveUnexportedStruct struct {
 	anotherStruct struct {
 		intType int
 	}
 }
 
-// Struct with no accessable fields.
-type NonAccessableFields struct {
+// Struct with no accesible fields.
+type NonaccesibleFields struct {
 	unexportedField string `env:"STRING_VAR" envDefault:"DefaultStringVal"`
 }
 
@@ -194,11 +194,11 @@ func TestNoTagsSet(t *testing.T) {
 	}
 }
 
-// Test a struct with no accessable fields.
+// Test a struct with no accesible fields.
 // It should return a *ErrFieldMustBeAssignable.
 func TestNonAssignableFields(t *testing.T) {
 	var err error
-	s := &NonAccessableFields{}
+	s := &NonaccesibleFields{}
 
 	if err = env.Parse(s); err != nil {
 		_, ok := err.(env.ErrFieldMustBeAssignable)
@@ -250,8 +250,8 @@ func TestRecursiveStructs(t *testing.T) {
 	}
 }
 
-// Test when parsing a struct that has an unaccessable/unexported field struct.
-func TestRecursiveUnaccessableStruct(t *testing.T) {
+// Test when parsing a struct that has an unaccesible/unexported field struct.
+func TestRecursiveUnaccesibleStruct(t *testing.T) {
 	var err error
 	s := &RecursiveUnexportedStruct{}
 
