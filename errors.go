@@ -5,19 +5,19 @@ import (
 	"fmt"
 )
 
-var InvalidInterfaceError = errors.New("env: struct parsing: expected pointer to struct")
+var ErrInvalidInterface = errors.New("env: struct parsing: expected pointer to struct")
 
-type UnsupportedFieldKindError struct {
+type ErrUnsupportedFieldKind struct {
 	FieldName string
 	FieldKind string
 }
 
-func (e UnsupportedFieldKindError) Error() string {
+func (e ErrUnsupportedFieldKind) Error() string {
 	return fmt.Sprintf("env: set value '%s': unsupported field kind '%s'", e.FieldName, e.FieldKind)
 }
 
-type FieldMustBeAssignableError string
+type ErrFieldMustBeAssignable string
 
-func (field FieldMustBeAssignableError) Error() string {
+func (field ErrFieldMustBeAssignable) Error() string {
 	return fmt.Sprintf("env: set value '%s': cannot set value to unexported field", string(field))
 }

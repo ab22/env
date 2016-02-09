@@ -66,7 +66,7 @@ type UnSupportedField struct {
 }
 
 // Test when parsing invalid types.
-// env.Parse should return an *env.InvalidInterfaceError.
+// env.Parse should return an *env.ErrInvalidInterface.
 func TestInvalidInterfaces(t *testing.T) {
 	values := []interface{}{
 		"string type",
@@ -81,15 +81,15 @@ func TestInvalidInterfaces(t *testing.T) {
 		// Parse by value
 		if err := env.Parse(v); err == nil {
 			t.Errorf("Accepting invalid type:", reflect.TypeOf(v))
-		} else if err != env.InvalidInterfaceError {
-			t.Fatal("Error should be of *env.InvalidInterfaceError but was:", reflect.TypeOf(v))
+		} else if err != env.ErrInvalidInterface {
+			t.Fatal("Error should be of *env.ErrInvalidInterface but was:", reflect.TypeOf(v))
 		}
 
 		// Parse by reference
 		if err := env.Parse(&v); err == nil {
 			t.Errorf("env.Parse accepting invalid type by reference:", reflect.TypeOf(&v))
-		} else if err != env.InvalidInterfaceError {
-			t.Fatal("Error should be of *env.InvalidInterfaceError but was:", reflect.TypeOf(v))
+		} else if err != env.ErrInvalidInterface {
+			t.Fatal("Error should be of *env.ErrInvalidInterface but was:", reflect.TypeOf(v))
 		}
 	}
 }
@@ -195,13 +195,13 @@ func TestNoTagsSet(t *testing.T) {
 }
 
 // Test a struct with no accessable fields.
-// It should return a *FieldMustBeAssignableError.
+// It should return a *ErrFieldMustBeAssignable.
 func TestNonAssignableFields(t *testing.T) {
 	var err error
 	s := &NonAccessableFields{}
 
 	if err = env.Parse(s); err != nil {
-		_, ok := err.(env.FieldMustBeAssignableError)
+		_, ok := err.(env.ErrFieldMustBeAssignable)
 
 		if ok {
 			return
@@ -212,20 +212,20 @@ func TestNonAssignableFields(t *testing.T) {
 }
 
 // Test a struct with a unsupported type
-// It should return a *UnsupportedFieldKindError.
+// It should return a *ErrUnsupportedFieldKind.
 func TestUnSupportedField(t *testing.T) {
 	var err error
 	s := &UnSupportedField{}
 
 	if err = env.Parse(s); err != nil {
-		_, ok := err.(*env.UnsupportedFieldKindError)
+		_, ok := err.(*env.ErrUnsupportedFieldKind)
 
 		if ok {
 			return
 		}
 	}
 
-	t.Errorf("Expected: [*env.UnsupportedFieldKindError] but got: [%s] ", err)
+	t.Errorf("Expected: [*env.ErrUnsupportedFieldKind] but got: [%s] ", err)
 }
 
 // Test when parsing a struct that has an struct. Values should be set
@@ -256,7 +256,7 @@ func TestRecursiveUnaccessableStruct(t *testing.T) {
 	s := &RecursiveUnexportedStruct{}
 
 	if err = env.Parse(s); err != nil {
-		_, ok := err.(env.FieldMustBeAssignableError)
+		_, ok := err.(env.ErrFieldMustBeAssignable)
 
 		if ok {
 			return
