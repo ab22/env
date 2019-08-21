@@ -80,16 +80,16 @@ func TestInvalidInterfaces(t *testing.T) {
 	for _, v := range values {
 		// Parse by value
 		if err := env.Parse(v); err == nil {
-			t.Errorf("Accepting invalid type:", reflect.TypeOf(v))
+			t.Errorf("Accepting invalid type: %v", reflect.TypeOf(v))
 		} else if err != env.ErrInvalidInterface {
-			t.Fatal("Error should be of *env.ErrInvalidInterface but was:", reflect.TypeOf(v))
+			t.Fatalf("Error should be of *env.ErrInvalidInterface but was: %v", reflect.TypeOf(v))
 		}
 
 		// Parse by reference
 		if err := env.Parse(&v); err == nil {
-			t.Errorf("env.Parse accepting invalid type by reference:", reflect.TypeOf(&v))
+			t.Errorf("env.Parse accepting invalid type by reference: %v", reflect.TypeOf(&v))
 		} else if err != env.ErrInvalidInterface {
-			t.Fatal("Error should be of *env.ErrInvalidInterface but was:", reflect.TypeOf(v))
+			t.Fatalf("Error should be of *env.ErrInvalidInterface but was: %v", reflect.TypeOf(v))
 		}
 	}
 }
